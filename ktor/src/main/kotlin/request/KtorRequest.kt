@@ -13,7 +13,7 @@ internal class KtorRequest(client: KtorClient) {
 
     private val clientRequest = client.clientKtor
 
-    suspend inline fun <reified Response : Any?> onRequest(requestConfig: RequestConfig): ApiResponse {
+    suspend inline fun <reified Response> onRequest(requestConfig: RequestConfig): ApiResponse {
         val response = clientRequest.request {
             this.url(requestConfig.url)
 
@@ -32,7 +32,7 @@ internal class KtorRequest(client: KtorClient) {
         return onProcessResponse<Response>(response)
     }
 
-    private suspend inline fun <reified Response : Any?> onProcessResponse(response: HttpResponse): ApiResponse {
+    private suspend inline fun <reified Response> onProcessResponse(response: HttpResponse): ApiResponse {
         return if (response.status.isSuccess()) {
             ApiResponse.Success(decodeJson<Response>(response.bodyAsText()), response.status.value)
         } else {

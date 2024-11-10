@@ -8,6 +8,7 @@ import org.example.facility.RequestType
 import org.example.request.KtorRequest
 
 suspend fun main() {
+
     val ktorClient: KtorClient = CustomClientKtor()
 
     val ktorRequest = KtorRequest(ktorClient)
@@ -21,7 +22,9 @@ suspend fun main() {
             contentType = "application/json"
         )
     )
-    println(result)
+
+    println("\nRequisição\n\n\n$result")
+
 }
 
 @Serializable
