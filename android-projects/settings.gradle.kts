@@ -10,7 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
-    includeBuild("build-manager")
+    //includeBuild("build-manager")
 }
 
 dependencyResolutionManagement {
@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Android Samples"
 include(":app")
+include(":mv-flow")
