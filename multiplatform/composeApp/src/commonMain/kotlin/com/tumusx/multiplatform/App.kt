@@ -48,7 +48,7 @@ class PostDetailScreenRoute(private val post: Post) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         
-        PostDetailScreenContent(
+        PostDetailScreen(
             post = post,
             onBackClick = { navigator.pop() }
         )
@@ -134,15 +134,4 @@ fun PostListScreenContent(
             }
         }
     }
-}
-
-@Composable
-fun PostDetailScreenContent(
-    post: Post,
-    onBackClick: () -> Unit
-) {
-    PostDetailScreen(
-        post = post,
-        onBackClick = onBackClick
-    )
 }
