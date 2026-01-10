@@ -44,13 +44,57 @@ fun App() {
                 val postId = backStackEntry.arguments?.getInt("postId") ?: 0
                 val uiState by viewModel.uiState.collectAsState()
                 
-                if (uiState is UiState.Success) {
-                    val post = (uiState as UiState.Success).posts.find { it.id == postId }
-                    post?.let {
-                        PostDetailScreen(
-                            post = it,
-                            onBackClick = { navController.popBackStack() }
-                        )
+                when (val state = uiState) {
+                    is UiState.Success -> {
+                        val post = state.posts.find { it.id == postId }
+                        if (post != null) {
+                            PostDetailScreen(
+                                post = post,
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        } else {
+                            // Post not found, show error
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Post not found",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Button(onClick = { navController.popBackStack() }) {
+                                        Text("Go Back")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is UiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    is UiState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "Error loading post",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(onClick = { navController.popBackStack() }) {
+                                    Text("Go Back")
+                                }
+                            }
+                        }
                     }
                 }
             }
