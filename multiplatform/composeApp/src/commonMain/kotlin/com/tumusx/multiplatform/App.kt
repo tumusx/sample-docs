@@ -37,13 +37,13 @@ class PostListScreen : Screen {
         PostListScreenContent(
             viewModel = viewModel,
             onPostClick = { post ->
-                navigator.push(PostDetailScreen(post))
+                navigator.push(PostDetailScreenRoute(post))
             }
         )
     }
 }
 
-class PostDetailScreen(private val post: Post) : Screen {
+class PostDetailScreenRoute(private val post: Post) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
