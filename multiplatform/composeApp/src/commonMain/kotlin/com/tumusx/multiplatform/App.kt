@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.tumusx.multiplatform.data.model.Post
 import com.tumusx.multiplatform.ui.PostDetailScreen
 import com.tumusx.multiplatform.ui.PostViewModel
 import com.tumusx.multiplatform.ui.UiState
@@ -24,88 +24,41 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     MaterialTheme {
-        val navController = rememberNavController()
-        val viewModel: PostViewModel = viewModel { PostViewModel() }
+        Navigator(PostListScreen())
+    }
+}
 
-        NavHost(navController = navController, startDestination = "postList") {
-            composable("postList") {
-                PostListScreen(
-                    viewModel = viewModel,
-                    onPostClick = { postId ->
-                        navController.navigate("postDetail/$postId")
-                    }
-                )
+class PostListScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val viewModel: PostViewModel = viewModel { PostViewModel() }
+        
+        PostListScreenContent(
+            viewModel = viewModel,
+            onPostClick = { post ->
+                navigator.push(PostDetailScreen(post))
             }
-            
-            composable(
-                route = "postDetail/{postId}",
-                arguments = listOf(navArgument("postId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-                val uiState by viewModel.uiState.collectAsState()
-                
-                when (val state = uiState) {
-                    is UiState.Success -> {
-                        val post = state.posts.find { it.id == postId }
-                        if (post != null) {
-                            PostDetailScreen(
-                                post = post,
-                                onBackClick = { navController.popBackStack() }
-                            )
-                        } else {
-                            // Post not found, show error
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = "Post not found",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    Button(onClick = { navController.popBackStack() }) {
-                                        Text("Go Back")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    is UiState.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    is UiState.Error -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "Error loading post",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Button(onClick = { navController.popBackStack() }) {
-                                    Text("Go Back")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        )
+    }
+}
+
+class PostDetailScreen(private val post: Post) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        
+        PostDetailScreenContent(
+            post = post,
+            onBackClick = { navigator.pop() }
+        )
     }
 }
 
 @Composable
-fun PostListScreen(
+fun PostListScreenContent(
     viewModel: PostViewModel,
-    onPostClick: (Int) -> Unit
+    onPostClick: (Post) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -139,7 +92,7 @@ fun PostListScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onPostClick(post.id) },
+                                .clickable { onPostClick(post) },
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -181,4 +134,15 @@ fun PostListScreen(
             }
         }
     }
+}
+
+@Composable
+fun PostDetailScreenContent(
+    post: Post,
+    onBackClick: () -> Unit
+) {
+    PostDetailScreen(
+        post = post,
+        onBackClick = onBackClick
+    )
 }
