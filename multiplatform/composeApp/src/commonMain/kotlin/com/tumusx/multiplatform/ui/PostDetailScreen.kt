@@ -105,8 +105,7 @@ fun PostDetailScreen(
                     text = post.body,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier.padding(16.dp),
-                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                    modifier = Modifier.padding(16.dp)
                 )
             }
         }
