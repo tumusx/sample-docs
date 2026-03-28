@@ -1,0 +1,5 @@
+appId: com.scode.ai.httpcat
+---
+- launchApp:
+    clearState: true
+- tapOn: "id-textHttpCat100"
